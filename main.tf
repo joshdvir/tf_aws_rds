@@ -8,6 +8,7 @@
 // - You should want your RDS instance in a VPC
 
 resource "aws_db_instance" "main_rds_instance" {
+    count = "${var.create_rds}"
     identifier = "${var.rds_instance_identifier}"
     allocated_storage = "${var.rds_allocated_storage}"
     engine = "${var.rds_engine_type}"
@@ -42,8 +43,10 @@ resource "aws_db_instance" "main_rds_instance" {
     backup_window = "${var.backup_window}"
 
     tags = "${merge(var.tags, map("Name", format("%s", var.rds_instance_identifier)))}"
-} 
+}
+
 resource "aws_db_parameter_group" "main_rds_instance" {
+    count = "${var.create_rds}"
     name = "${var.rds_instance_identifier}-${replace(var.db_parameter_group, ".", "")}-custom-params"
     family = "${var.db_parameter_group}"
 
@@ -62,6 +65,7 @@ resource "aws_db_parameter_group" "main_rds_instance" {
 }
 
 resource "aws_db_subnet_group" "main_db_subnet_group" {
+    count = "${var.create_rds}"
     name = "${var.rds_instance_identifier}-subnetgrp"
     description = "RDS subnet group"
     subnet_ids = ["${var.subnets}"]
@@ -71,6 +75,7 @@ resource "aws_db_subnet_group" "main_db_subnet_group" {
 
 # Security groups
 resource "aws_security_group" "main_db_access" {
+  count = "${var.create_rds}"
   name = "${var.rds_instance_identifier}-access"
   description = "Allow access to the database"
   vpc_id = "${var.rds_vpc_id}"
@@ -79,6 +84,7 @@ resource "aws_security_group" "main_db_access" {
 }
 
 resource "aws_security_group_rule" "allow_db_access" {
+    count = "${var.create_rds}"
     type = "ingress"
 
     from_port = "${var.database_port}"
@@ -90,6 +96,7 @@ resource "aws_security_group_rule" "allow_db_access" {
 }
 
 resource "aws_security_group_rule" "allow_all_outbound" {
+    count = "${var.create_rds}"
     type = "egress"
 
     from_port   = 0

@@ -121,3 +121,8 @@ variable "tags" {
   description = "A map of tags to add to all resources"
   default     = {}
 }
+
+variable "create_rds" {
+  description = "If set to true, create the RDS DB"
+  default     = true
+}
